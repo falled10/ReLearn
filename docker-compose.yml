@@ -18,4 +18,3 @@ services:
     env_file: .env
     depends_on:
       - relearn_redis
-    network_mode: host
