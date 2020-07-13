@@ -34,7 +34,7 @@ def set_answer(word, user, right_answer, word_id):
 
 
 def get_next_word(message, MENU):
-    r = redis.Redis(host='localhost', port=REDIS_PORT, db=0)
+    r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
     user = message.from_user
     markup = ReplyKeyboardMarkup()
     word = get_random_word(user)
