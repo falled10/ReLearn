@@ -1,6 +1,7 @@
 import requests
 import redis
 from telebot.types import ReplyKeyboardMarkup
+from telebot import TeleBot
 
 from app.config import API_URL, REDIS_HOST, REDIS_PORT
 
@@ -33,14 +34,34 @@ def set_answer(word, user, right_answer, word_id):
     return f"Правильный ответ: {right_answer}"
 
 
-def get_next_word(message, MENU):
-    r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
+def get_next_word(message, menu):
     user = message.from_user
     markup = ReplyKeyboardMarkup()
     word = get_random_word(user)
     markup.add(*word['variants'])
-    markup.add(*MENU)
-    r.set(user.id, word['word']['word'])
-    r.set(f'{user.id}_word_id', word['word']['id'])
-    r.close()
+    markup.add(*menu)
+    with redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0) as r:
+        r.set(user.id, word['word']['word'])
+        r.set(f'{user.id}_word_id', word['word']['id'])
     return markup, word['word']['translation']
+
+
+def set_messages_ids(messages: list, user_id: int):
+    with redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0) as r:
+        r.set(f'{user_id}_messages', ','.join(messages))
+
+
+def remove_messages_by_ids(user_id: str, bot: TeleBot, chat_id: str):
+    with redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0) as r:
+        messages = r.get(f'{user_id}_messages')
+        if messages:
+            messages = messages.decode('utf-8').split(',')
+            for message in messages:
+                bot.delete_message(chat_id, message)
+
+
+def append_message_id_to_messages_ids(message, user_id):
+    with redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0) as r:
+        messages = r.get(f'{user_id}_messages')
+        if messages:
+            r.set(f'{user_id}_messages', messages.decode('utf-8') + f',{message}')
