@@ -14,8 +14,8 @@ def get_random_word(user):
     return resp.json()
 
 
-def get_word(word):
-    resp = requests.get(f'{API_URL}/words/{word}')
+def get_word(word_id):
+    resp = requests.get(f'{API_URL}/words/{word_id}')
     return resp.json()
 
 
@@ -41,7 +41,7 @@ def get_next_word(message, menu):
     markup.add(*word['variants'])
     markup.add(*menu)
     with redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0) as r:
-        r.set(user.id, word['word']['word'])
+        r.set(user.id, word['word']['id'])
         r.set(f'{user.id}_word_id', word['word']['id'])
     return markup, word['word']['translation']
 
