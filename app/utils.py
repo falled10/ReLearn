@@ -41,7 +41,7 @@ def get_next_word(message, menu):
     markup.add(*word['variants'])
     markup.add(*menu)
     with redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0) as r:
-        r.set(user.id, word['word']['id'])
+        r.set(user.id, word['word']['word'])
         r.set(f'{user.id}_word_id', word['word']['id'])
     return markup, word['word']['translation']
 
