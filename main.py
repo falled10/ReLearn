@@ -16,6 +16,7 @@ bot = telebot.TeleBot(TOKEN)
 def start_handler(message: Message) -> None:
     markup = ReplyKeyboardMarkup()
     user = message.from_user
+    remove_messages_by_ids(message.from_user.id, bot, message.chat.id)
     try:
         create_user(user)
     except requests.exceptions.ConnectionError:

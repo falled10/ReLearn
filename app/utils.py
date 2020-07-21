@@ -1,6 +1,7 @@
 import requests
 import redis
 from telebot.types import ReplyKeyboardMarkup
+from telebot.apihelper import ApiException
 from telebot import TeleBot
 
 from app.config import API_URL, REDIS_HOST, REDIS_PORT
@@ -57,7 +58,10 @@ def remove_messages_by_ids(user_id: str, bot: TeleBot, chat_id: str):
         if messages:
             messages = messages.decode('utf-8').split(',')
             for message in messages:
-                bot.delete_message(chat_id, message)
+                try:
+                    bot.delete_message(chat_id, message)
+                except ApiException:
+                    pass
 
 
 def append_message_id_to_messages_ids(message, user_id):
