@@ -31,7 +31,7 @@ def start_handler(message: Message) -> None:
 def get_right_answer_handler(message: Message) -> None:
     user = message.from_user
     with redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0) as r:
-        word_id = r.get(user.id).decode('utf-8')
+        word_id = r.get(f'{user.id}_word_id').decode('utf-8')
     markup = ReplyKeyboardMarkup()
     right_answer = get_word(word_id)
     text = RIGHT_ANSWER_TEXT.format(right_answer['word'], right_answer['transcription'],
