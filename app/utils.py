@@ -1,6 +1,5 @@
 import requests
 import shelve
-import json
 
 from telebot.types import ReplyKeyboardMarkup
 from telebot.apihelper import ApiException
@@ -51,14 +50,14 @@ def get_next_word(message, menu):
     markup.add(*word['variants'])
     markup.add(*menu)
     with shelve.open(STORAGE_FILENAME) as db:
-        db[user.id] = word['word']['word']
+        db[str(user.id)] = word['word']['word']
         db[f'{user.id}_word_id'] = word['word']['id']
     return markup, word['word']['translation']
 
 
 def remove_messages_by_ids(user_id: str, bot: TeleBot, chat_id: str):
     with shelve.open(STORAGE_FILENAME) as db:
-        messages = json.loads(db.pop(f'{user_id}_messages', '[]'))
+        messages = db.pop(f'{user_id}_messages', [])
         for message in messages:
             try:
                 bot.delete_message(chat_id, message)
@@ -68,14 +67,14 @@ def remove_messages_by_ids(user_id: str, bot: TeleBot, chat_id: str):
 
 def append_message_id_to_messages_ids(message, user_id):
     with shelve.open(STORAGE_FILENAME) as db:
-        messages = json.loads(db.get(f'{user_id}_messages', '[]'))
+        messages = db.get(f'{user_id}_messages', [])
         messages.append(message)
         db[f'{user_id}_messages'] = messages
 
 
 def get_word_and_word_id(user_id):
     with shelve.open(STORAGE_FILENAME) as db:
-        word = db.pop(user_id, None)
+        word = db.pop(str(user_id), None)
         word_id = db.pop(f'{user_id}_word_id', None)
         return word, word_id
 
