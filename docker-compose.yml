@@ -1,14 +1,6 @@
 version: "3"
 
 services:
-  relearn_redis:
-    container_name: relearn_redis
-    image: redis:latest
-    env_file: .env
-    volumes:
-      - ./.data/redis:/data
-    ports:
-      - 6379:6379
   relearn_client:
     container_name: relearn_client
     build:
@@ -16,5 +8,3 @@ services:
     volumes:
       - .:/usr/src/app
     env_file: .env
-    depends_on:
-      - relearn_redis
