@@ -23,7 +23,7 @@ def get_word(word_id):
 
 def get_right_answer(user_id):
     with shelve.open(STORAGE_FILENAME) as db:
-        return db.pop(f'{user_id}_word_id')
+        return db.pop(f'{user_id}_word_id', None)
 
 
 def create_user(user):
